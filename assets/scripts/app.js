@@ -21,6 +21,10 @@ const updateUI = () => {
     entryTextSection.style.display = 'none';
   }
 };
+const closeMovieDeletionModal = () => {
+  toggleBackdrop();
+  deleteMovieModal.classList.remove('visible');
+};
 
 const deleteMovie = movieId => {
   let movieIndex = 0;
@@ -30,21 +34,28 @@ const deleteMovie = movieId => {
     }
     movieIndex++;
   }
-  movies.splice(movieIndex, 1);
+  movies.splice(movieIndex, 1);    //splice удаляет указанный элемент из массива а все остальные элементы продвигает вверх
   const listRoot = document.getElementById('movie-list');
   listRoot.children[movieIndex].remove();
   // listRoot.removeChild(listRoot.children[movieIndex]);
-};
-
-const closeMovieDeletionModal = () => {
-  toggleBackdrop();
-  deleteMovieModal.classList.remove('visible');
+  closeMovieDeletionModal();
+  updateUI();
 };
 
 const deleteMovieHandler = movieId => {
   deleteMovieModal.classList.add('visible');
   toggleBackdrop();
-  // deleteMovie(movieId);
+  const cancelDeletButton = deleteMovieModal.querySelector('.btn--passive');
+  let  confirmeDeletButton = deleteMovieModal.querySelector('.btn--danger');
+
+confirmeDeletButton.replaceWith(confirmeDeletButton.cloneNode(true));
+
+confirmeDeletButton = deleteMovieModal.querySelector('.btn--danger');
+
+  // confirmeDeletButton.removeEventListener('click',deleteMovieHandler.bind(null,movieId));  //  не сработает 
+  cancelDeletButton.removeEventListener('click',closeMovieDeletionModal);
+  cancelDeletButton.addEventListener('click', closeMovieDeletionModal);
+  confirmeDeletButton.addEventListener('click', deleteMovie.bind(null,movieId))
 };
 
 const renderNewMovieElement = (id, title, imageUrl, rating) => {
@@ -86,6 +97,7 @@ const clearMovieInput = () => {
 
 const cancelAddMovieHandler = () => {
   closeMovieModal();
+  toggleBackdrop();
   clearMovieInput();
 };
 
@@ -129,6 +141,7 @@ const addMovieHandler = () => {
 const backdropClickHandler = () => {
   closeMovieModal();
   closeMovieDeletionModal();
+  clearMovieInput();
 };
 
 startAddMovieButton.addEventListener('click', showMovieModal);
